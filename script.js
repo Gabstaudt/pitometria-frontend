@@ -9,6 +9,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 document.addEventListener('DOMContentLoaded', () => {
   carregarSetores();
   carregarPontos();
+  carregarGraficos(); 
+
 
   // Formulário de Setores
   const formularioSetor = document.getElementById('setor-form');
@@ -112,5 +114,71 @@ async function carregarPontos() {
 }
 document.getElementById('exportar-planilha').addEventListener('click', () => {
   window.location.href = 'http://localhost:3000/api/pontos/exportar'; // Ajuste para a URL correta do backend
+});
+
+
+
+async function carregarGraficos() {
+  try {
+      // Buscar os dados do backend
+      const response = await fetch(`${apiBaseUrl}/pontos/relatorios/dados-graficos`);
+      const dados = await response.json();
+
+      if (dados.length === 0) {
+          console.error('Nenhum dado encontrado para os gráficos.');
+          return;
+      }
+
+      // Gráfico de Barras
+      const barCtx = document.getElementById('graficoBarras').getContext('2d');
+      new Chart(barCtx, {
+          type: 'bar',
+          data: {
+              labels: dados.map(d => d.categoria),
+              datasets: [{
+                  label: 'Vazão por Setor (m³/h)',
+                  data: dados.map(d => d.total),
+                  backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+              }],
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: { position: 'top' },
+              },
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  }
+              }
+          },
+      });
+
+      // Gráfico de Pizza
+      const pieCtx = document.getElementById('graficoPizza').getContext('2d');
+      new Chart(pieCtx, {
+          type: 'pie',
+          data: {
+              labels: dados.map(d => d.categoria),
+              datasets: [{
+                  data: dados.map(d => d.total),
+                  backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+              }],
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: { position: 'top' },
+              },
+          },
+      });
+  } catch (error) {
+      console.error('Erro ao carregar os gráficos:', error.message);
+  }
+}
+
+// Chamar a função ao carregar o DOM
+document.addEventListener('DOMContentLoaded', () => {
+  carregarGraficos();
 });
 

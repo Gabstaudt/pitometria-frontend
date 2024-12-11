@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
   <header>
@@ -41,6 +43,15 @@
         <button type="submit">Adicionar Ponto</button>
         <button id="exportar-planilha">Exportar Pontos de Medição</button>
 
+        <div class="graficos-container">
+          <h2>Gráfico de Barras</h2>
+          <canvas id="graficoBarras"></canvas>
+        
+          <h2>Gráfico de Pizza</h2>
+          <canvas id="graficoPizza"></canvas>
+        </div>
+        
+      
       </form>
     </section>
   </main>
