@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pitometria - Mapa</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Sistema de Pitometria</h1>
+  </header>
+
+  <main>
+    <section id="map-section">
+      <h2>Mapa de Pontos de Medição</h2>
+      <div id="map"></div>
+    </section>
+    <section id="setores">
+      <h2>Setores</h2>
+      <ul id="setores-list"></ul>
+      <form id="setor-form">
+        <input type="text" id="setor-nome" placeholder="Nome do setor" required>
+        <button type="submit">Adicionar Setor</button>
+      </form>
+    </section>
+    <section id="pontos">
+      <h2>Pontos de Medição</h2>
+      <ul id="pontos-list"></ul>
+      <form id="ponto-form">
+        <input type="text" id="ponto-nome" placeholder="Nome do ponto" required>
+        <input type="text" id="ponto-ep" placeholder="EP" required>
+        <input type="number" id="ponto-vazao" placeholder="Vazão (m³/h)" step="0.01" required>
+        <input type="number" id="ponto-latitude" placeholder="Latitude" step="0.000001" required>
+        <input type="number" id="ponto-longitude" placeholder="Longitude" step="0.000001" required>
+        <select id="ponto-setor">
+          <option value="">Selecione um Setor</option>
+        </select>
+        <button type="submit">Adicionar Ponto</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
