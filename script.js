@@ -110,3 +110,7 @@ async function carregarPontos() {
     }
   });
 }
+document.getElementById('exportar-planilha').addEventListener('click', () => {
+  window.location.href = 'http://localhost:3000/api/pontos/exportar'; // Ajuste para a URL correta do backend
+});
+
