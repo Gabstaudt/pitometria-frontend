@@ -42,7 +42,36 @@
         </select>
         <button type="submit">Adicionar Ponto</button>
         <button id="exportar-planilha">Exportar Pontos de Medição</button>
-
+        <div id="modal-editar" class="modal" style="display: none;">
+          <div class="modal-content">
+            <h3>Editar Ponto de Medição</h3>
+            <form id="form-editar-ponto">
+              <label for="editar-nome-modal">Ponto de Medição:</label>
+              <input type="text" id="editar-nome-modal" name="ponto_de_medicao" required />
+        
+              <label for="editar-ep-modal">EP:</label>
+              <input type="text" id="editar-ep-modal" name="ep" required />
+        
+              <label for="editar-vazao-modal">Vazão (m³/h):</label>
+              <input type="number" id="editar-vazao-modal" name="vazao_m3_h" required />
+        
+              <label for="editar-pressao-modal">Pressão (mca):</label>
+              <input type="number" id="editar-pressao-modal" name="pressao_mca" required />
+        
+              <label for="editar-latitude-modal">Latitude:</label>
+              <input type="number" id="editar-latitude-modal" name="latitude" required />
+        
+              <label for="editar-longitude-modal">Longitude:</label>
+              <input type="number" id="editar-longitude-modal" name="longitude" required />
+        
+              <label for="editar-observacao-modal">Observação:</label>
+              <textarea id="editar-observacao-modal" name="observacao"></textarea>
+        
+              <button type="submit">Salvar Alterações</button>
+              <button type="button" id="fechar-modal">Cancelar</button>
+            </form>
+          </div>
+        </div>
         <div class="graficos-container">
           <h2>Gráfico de Barras</h2>
           <canvas id="graficoBarras"></canvas>
@@ -51,9 +80,13 @@
           <canvas id="graficoPizza"></canvas>
         </div>
         
-      
       </form>
+
     </section>
+
+  
+
+
   </main>
 
   <script src="script.js"></script>

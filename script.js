@@ -88,6 +88,7 @@ async function carregarPontos() {
   const pontos = await response.json();
   const listaPontos = document.getElementById('pontos-list');
   listaPontos.innerHTML = '';
+  
   map.eachLayer((layer) => {
     if (layer instanceof L.Marker) {
       map.removeLayer(layer);
@@ -97,35 +98,24 @@ async function carregarPontos() {
   pontos.forEach((ponto) => {
     const li = document.createElement('li');
     li.textContent = `${ponto.ponto_de_medicao} - Setor: ${ponto.setor_id}`;
-    const botaoExcluir = document.createElement('button');
-    botaoExcluir.textContent = 'Excluir';
-    botaoExcluir.onclick = async () => {
-      await fetch(`${apiBaseUrl}/pontos/${ponto.id}`, { method: 'DELETE' });
-      carregarPontos();
-    };
-    li.appendChild(botaoExcluir);
+    
+    // Botão para abrir o modal de edição
+    const botaoEditar = document.createElement('button');
+    botaoEditar.textContent = 'Editar';
+    botaoEditar.style.marginLeft = '10px'; // Espaçamento entre texto e botão
+    botaoEditar.onclick = () => abrirModalEditar(ponto);
+    li.appendChild(botaoEditar);
+
     listaPontos.appendChild(li);
 
+    // Adicionar marcador no mapa
     if (ponto.latitude && ponto.longitude) {
       const marker = L.marker([ponto.latitude, ponto.longitude]).addTo(map);
-
-      // Adicione evento de clique no marcador
-      marker.on('click', async () => {
-        const response = await fetch(`${apiBaseUrl}/pontos/${ponto.id}`);
-        const detalhes = await response.json();
-
-        // Conteúdo detalhado do popup
-        const popupContent = `
-          <b>${detalhes.ponto_de_medicao}</b><br>
-          Vazão: ${detalhes.vazao_m3_h} m³/h<br>
-          Pressão: ${detalhes.pressao_mca} mca<br>
-          Observação: ${detalhes.observacao || 'Nenhuma'}
-        `;
-        marker.bindPopup(popupContent).openPopup();
-      });
+      marker.bindPopup(`<b>${ponto.ponto_de_medicao}</b><br>Setor: ${ponto.setor_id}`);
     }
   });
 }
+
 
 // Adicionar evento para exportar planilha
 document.getElementById('exportar-planilha').addEventListener('click', () => {
@@ -197,4 +187,76 @@ async function carregarGraficos() {
 document.addEventListener('DOMContentLoaded', () => {
   carregarGraficos();
 });
+
+let pontoSelecionado = null; // Para armazenar o ponto em edição
+
+async function carregarPontos() {
+  const response = await fetch(`${apiBaseUrl}/pontos`);
+  const pontos = await response.json();
+  const listaPontos = document.getElementById('pontos-list');
+  listaPontos.innerHTML = '';
+  map.eachLayer((layer) => {
+    if (layer instanceof L.Marker) {
+      map.removeLayer(layer);
+    }
+  });
+
+  pontos.forEach((ponto) => {
+    const li = document.createElement('li');
+    li.textContent = `${ponto.ponto_de_medicao} - Setor: ${ponto.setor_id}`;
+
+    const botaoEditar = document.createElement('button');
+    botaoEditar.textContent = 'Editar';
+    botaoEditar.onclick = () => abrirModalEditar(ponto);
+    li.appendChild(botaoEditar);
+
+    listaPontos.appendChild(li);
+
+    if (ponto.latitude && ponto.longitude) {
+      const marker = L.marker([ponto.latitude, ponto.longitude]).addTo(map);
+      marker.bindPopup(`<b>${ponto.ponto_de_medicao}</b><br>Setor: ${ponto.setor_id}`);
+    }
+  });
+}
+
+function abrirModalEditar(ponto) {
+  pontoSelecionado = ponto; // Armazenar o ponto selecionado
+  document.getElementById('editar-nome').value = ponto.ponto_de_medicao;
+  document.getElementById('editar-ep').value = ponto.ep;
+  document.getElementById('editar-vazao').value = ponto.vazao_m3_h;
+  document.getElementById('editar-pressao').value = ponto.pressao_mca;
+  document.getElementById('editar-latitude').value = ponto.latitude;
+  document.getElementById('editar-longitude').value = ponto.longitude;
+  document.getElementById('editar-observacao').value = ponto.observacao || '';
+  
+  document.getElementById('modal-editar').style.display = 'flex';
+}
+
+document.getElementById('fechar-modal').addEventListener('click', () => {
+  document.getElementById('modal-editar').style.display = 'none';
+});
+
+document.getElementById('form-editar-ponto').addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const pontoAtualizado = {
+    ponto_de_medicao: document.getElementById('editar-nome').value,
+    ep: document.getElementById('editar-ep').value,
+    vazao_m3_h: parseFloat(document.getElementById('editar-vazao').value),
+    pressao_mca: parseFloat(document.getElementById('editar-pressao').value),
+    latitude: parseFloat(document.getElementById('editar-latitude').value),
+    longitude: parseFloat(document.getElementById('editar-longitude').value),
+    observacao: document.getElementById('editar-observacao').value,
+  };
+
+  await fetch(`${apiBaseUrl}/pontos/${pontoSelecionado.id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(pontoAtualizado),
+  });
+
+  document.getElementById('modal-editar').style.display = 'none';
+  carregarPontos();
+});
+
 
