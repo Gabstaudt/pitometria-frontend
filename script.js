@@ -108,10 +108,26 @@ async function carregarPontos() {
 
     if (ponto.latitude && ponto.longitude) {
       const marker = L.marker([ponto.latitude, ponto.longitude]).addTo(map);
-      marker.bindPopup(`<b>${ponto.ponto_de_medicao}</b><br>Setor: ${ponto.setor_id}`).openPopup();
+
+      // Adicione evento de clique no marcador
+      marker.on('click', async () => {
+        const response = await fetch(`${apiBaseUrl}/pontos/${ponto.id}`);
+        const detalhes = await response.json();
+
+        // Conteúdo detalhado do popup
+        const popupContent = `
+          <b>${detalhes.ponto_de_medicao}</b><br>
+          Vazão: ${detalhes.vazao_m3_h} m³/h<br>
+          Pressão: ${detalhes.pressao_mca} mca<br>
+          Observação: ${detalhes.observacao || 'Nenhuma'}
+        `;
+        marker.bindPopup(popupContent).openPopup();
+      });
     }
   });
 }
+
+// Adicionar evento para exportar planilha
 document.getElementById('exportar-planilha').addEventListener('click', () => {
   window.location.href = 'http://localhost:3000/api/pontos/exportar'; // Ajuste para a URL correta do backend
 });
