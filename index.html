@@ -31,7 +31,7 @@
     <section id="pontos">
       <h2>Pontos de Medição</h2>
       <ul id="pontos-list"></ul>
-      <form id="ponto-form">
+      <!-- <form id="ponto-form">
         <input type="text" id="ponto-nome" placeholder="Nome do ponto" required>
         <input type="text" id="ponto-ep" placeholder="EP" required>
         <input type="number" id="ponto-vazao" placeholder="Vazão (m³/h)" step="0.01" required>
@@ -40,7 +40,7 @@
         <select id="ponto-setor">
           <option value="">Selecione um Setor</option>
         </select>
-        <button type="submit">Adicionar Ponto</button>
+        <button type="submit">Adicionar Ponto</button> -->
         <button id="exportar-planilha">Exportar Pontos de Medição</button>
         <div id="modal-editar" class="modal" style="display: none;">
           <div class="modal-content">
@@ -48,21 +48,23 @@
             <form id="form-editar-ponto">
               <label for="editar-nome-modal">Ponto de Medição:</label>
               <input type="text" id="editar-nome-modal" name="ponto_de_medicao" required />
-        
-              <label for="editar-ep-modal">EP:</label>
+               <br>
+              <label for="editar-ep-modal">EP:</label><br>
               <input type="text" id="editar-ep-modal" name="ep" required />
         
               <label for="editar-vazao-modal">Vazão (m³/h):</label>
-              <input type="number" id="editar-vazao-modal" name="vazao_m3_h" required />
-        
+              <input type="number" id="editar-vazao-modal" name="vazao_m3_h" step="any" required />
+              
               <label for="editar-pressao-modal">Pressão (mca):</label>
-              <input type="number" id="editar-pressao-modal" name="pressao_mca" required />
-        
+              <input type="number" id="editar-pressao-modal" name="pressao_mca" step="any" required />
+              
               <label for="editar-latitude-modal">Latitude:</label>
-              <input type="number" id="editar-latitude-modal" name="latitude" required />
-        
+              <input type="number" id="editar-latitude-modal" name="latitude" step="any" required />
+              
               <label for="editar-longitude-modal">Longitude:</label>
-              <input type="number" id="editar-longitude-modal" name="longitude" required />
+              <input type="number" id="editar-longitude-modal" name="longitude" step="any" required />
+              
+              
         
               <label for="editar-observacao-modal">Observação:</label>
               <textarea id="editar-observacao-modal" name="observacao"></textarea>
@@ -72,6 +74,7 @@
             </form>
           </div>
         </div>
+        
         <div class="graficos-container">
           <h2>Gráfico de Barras</h2>
           <canvas id="graficoBarras"></canvas>
