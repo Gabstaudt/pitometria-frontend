@@ -43,49 +43,97 @@ async function carregarSetores() {
 }
 
 // Função para carregar pontos e plotar no mapa
+let todosPontos = []; // Armazena todos os pontos para facilitar a pesquisa
+
 async function carregarPontos() {
   try {
     const response = await fetch(`${apiBaseUrl}/pontos`);
-    const pontos = await response.json();
-    const listaPontos = document.getElementById('pontos-list');
-    listaPontos.innerHTML = '';
+    if (!response.ok) throw new Error('Erro ao buscar os pontos');
 
-    // Limpa marcadores existentes no mapa
-    map.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        map.removeLayer(layer);
-      }
-    });
+    todosPontos = await response.json(); // Salva todos os pontos
+    console.log('Pontos recebidos da API:', todosPontos);
 
-    // Adiciona pontos à lista e ao mapa
-    pontos.forEach((ponto) => {
-      const li = document.createElement('li');
-      li.textContent = `${ponto.ponto_de_medicao} - Setor: ${ponto.setor_id}`;
-
-      // Botão para editar
-      const botaoEditar = document.createElement('button');
-      botaoEditar.textContent = 'Editar';
-      botaoEditar.style.marginLeft = '10px';
-      botaoEditar.onclick = () => abrirModalEditar(ponto);
-      li.appendChild(botaoEditar);
-
-      listaPontos.appendChild(li);
-
-      // Adiciona marcador no mapa
-      if (ponto.latitude && ponto.longitude) {
-        const marker = L.marker([ponto.latitude, ponto.longitude]).addTo(map);
-        marker.bindPopup(`
-          <b>${ponto.ponto_de_medicao}</b><br>
-          Vazão: ${ponto.vazao_m3_h || 'N/A'} m³/h<br>
-          Pressão: ${ponto.pressao_mca || 'N/A'} mca<br>
-          Observação: ${ponto.observacao || 'Nenhuma'}
-        `);
-      }
-    });
+    exibirPontos(todosPontos); // Exibe os pontos no mapa e na lista
   } catch (error) {
-    console.error('Erro ao carregar pontos:', error);
+    console.error('Erro ao carregar pontos:', error.message);
   }
 }
+
+function exibirPontos(pontos) {
+  const listaPontos = document.getElementById('pontos-list');
+  listaPontos.innerHTML = '';
+
+  // Limpa marcadores antigos
+  map.eachLayer((layer) => {
+    if (layer instanceof L.Marker) {
+      map.removeLayer(layer);
+    }
+  });
+
+  // Adiciona pontos ao mapa e à lista
+  pontos.forEach((ponto) => {
+    if (ponto.latitude && ponto.longitude) {
+      console.log(`Adicionando marcador para: ${ponto.ponto_de_medicao}`);
+      const marker = L.marker([ponto.latitude, ponto.longitude]).addTo(map);
+      marker.bindPopup(`
+        <div style="font-family: Arial, sans-serif;">
+          <b style="color: #007bff;">${ponto.ponto_de_medicao}</b><br>
+          <b>Setor:</b> <span style="color: #007bff;">${ponto.setor_nome || 'Desconhecido'}</span><br>
+          <b>Vazão:</b> ${ponto.vazao_m3_h || 'N/A'} m³/h<br>
+          <b>Pressão:</b> ${ponto.pressao_mca || 'N/A'} mca<br>
+          <b>Observação:</b> ${ponto.observacao || 'Nenhuma'}
+        </div>
+      `);
+    }
+
+    // Adiciona ponto à lista
+    const li = document.createElement('li');
+    li.textContent = `${ponto.ponto_de_medicao} - Setor: ${ponto.setor_id}`;
+    listaPontos.appendChild(li);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', carregarPontos);
+
+
+// Função para atualizar a lista de pontos com base nos dados filtrados
+function atualizarListaPontos(pontosFiltrados) {
+  const listaPontos = document.getElementById('pontos-list');
+  listaPontos.innerHTML = '';
+
+  pontosFiltrados.forEach((ponto) => {
+    const li = document.createElement('li');
+    li.textContent = `${ponto.ponto_de_medicao} - Setor: ${ponto.setor_id}`;
+
+    // Botão de editar
+    const botaoEditar = document.createElement('button');
+    botaoEditar.textContent = 'Editar';
+    botaoEditar.style.marginLeft = '10px';
+    botaoEditar.onclick = () => abrirModalEditar(ponto);
+    li.appendChild(botaoEditar);
+
+    listaPontos.appendChild(li);
+  });
+}
+
+// Adiciona evento para o campo de pesquisa
+document.getElementById('pesquisa-pontos').addEventListener('input', (event) => {
+  const termoPesquisa = event.target.value.toLowerCase();
+
+  // Filtrar pontos pelo termo de pesquisa
+  const pontosFiltrados = todosPontos.filter((ponto) =>
+    ponto.ponto_de_medicao.toLowerCase().includes(termoPesquisa)
+  );
+
+  // Atualizar a lista com os pontos filtrados
+  atualizarListaPontos(pontosFiltrados);
+});
+
+// Chamar a função de carregar pontos ao carregar o DOM
+document.addEventListener('DOMContentLoaded', () => {
+  carregarPontos();
+});
+
 
 // Função para abrir modal de edição
 function abrirModalEditar(ponto) {
